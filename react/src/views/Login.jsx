@@ -1,4 +1,28 @@
+import { createRef } from "react";
+import axiosClient from "./axiosClient";
+import { useContextProvider } from "../ContextProvider";
+
 export default function Login() {
+    const emailRef = createRef();
+    const passwordRef = createRef();
+    const { setUser, setToken } = useContextProvider();
+    const onSubmit = (e) => {
+        e.preventDefault();
+        const payload = {
+            email: emailRef.current.value,
+            password: passwordRef.current.value,
+        };
+        axiosClient
+            .post("/login", payload)
+            .then((data) => {
+                console.log(data);
+                setUser(data.data.user);
+                setToken(data.data.token);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
     return (
         <>
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -14,7 +38,12 @@ export default function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form className="space-y-6" action="#" method="POST">
+                    <form
+                        className="space-y-6"
+                        action="#"
+                        method="POST"
+                        onSubmit={onSubmit}
+                    >
                         <div>
                             <label
                                 htmlFor="email"
@@ -24,6 +53,7 @@ export default function Login() {
                             </label>
                             <div className="mt-2">
                                 <input
+                                    ref={emailRef}
                                     id="email"
                                     name="email"
                                     type="email"
@@ -53,6 +83,7 @@ export default function Login() {
                             </div>
                             <div className="mt-2">
                                 <input
+                                    ref={passwordRef}
                                     id="password"
                                     name="password"
                                     type="password"
@@ -74,7 +105,7 @@ export default function Login() {
                     </form>
 
                     <p className="mt-10 text-center text-sm text-gray-500">
-                        Not a member?{" "}
+                        Not a member?
                         <a
                             href="#"
                             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"

@@ -5,6 +5,8 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useContextProvider } from "../ContextProvider";
 import { Navigate } from "react-router-dom";
 
+import axiosClient from "../views/axiosClient";
+
 const navigation = [
     { name: "Dashboard", to: "/" },
     { name: "Surveys", to: "/surveys" },
@@ -14,16 +16,24 @@ const userNavigation = { name: "Sign out", to: "#" };
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
 }
-const logout = (e) => {
-    e.preventDefault();
-    console.log("logout");
-};
 
 export default function DefaultLayout() {
-    const { token, user } = useContextProvider();
+    const { token, user, setUser, setToken } = useContextProvider();
     if (!token) {
         return <Navigate to="/login" />;
     }
+    const logout = (e) => {
+        e.preventDefault();
+        axiosClient
+            .post("/logout")
+            .then(() => {
+                setUser({});
+                setToken(null);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
     return (
         <>
             <div className="min-h-full">
